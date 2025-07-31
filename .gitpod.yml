@@ -2,11 +2,15 @@ image:
   file: .gitpod.Dockerfile
 
 tasks:
-  - name: Start Frappe Dev
+  - name: Setup Frappe HRMS
     init: |
+      pip install frappe-bench
       sudo service mysql start
       sudo service redis-server start
-      bench setup requirements
     command: |
-      cd frappe-bench || true
+      bench init frappe-bench --frappe-path https://github.com/frappe/frappe --frappe-branch version-15
+      cd frappe-bench
+      bench get-app hrms --branch version-15
+      bench new-site hrms.local --db-root-password=root --admin-password=admin --mariadb-root-password=root
+      bench --site hrms.local install-app hrms
       bench start
